@@ -24,3 +24,6 @@ app = FastAPI(title="Kortly",
 async def root():
     logger.info("Root endpoint accessed")
     return {"message": "Welcome to Kortly!"}
+
+from src.links.controller import router as links_router
+app.include_router(links_router)
