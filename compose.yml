@@ -1,0 +1,17 @@
+services:
+  database:
+    image: postgres:18-alpine
+    container_name: kortly_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kortly_user
+      POSTGRES_PASSWORD: kortly_password
+      POSTGRES_DB: kortly_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
+    driver: local
