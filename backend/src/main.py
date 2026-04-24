@@ -26,4 +26,5 @@ async def root():
     return {"message": "Welcome to Kortly!"}
 
 from src.links.controller import router as links_router
+
 app.include_router(links_router)

@@ -3,11 +3,12 @@ from sqlmodel import Session, select
 
 from src.entities.links import Link
 from src.logging import logger
-from .exception import LinkGenerationError
+from .exception import LinkGenerationError, LinkNotFoundError
 
 MAX_INTENTOS = 5
+LARGO_CODIGO = 8
 
-def acortar_url(url: str, session: Session, large: int = 8) -> str:
+def acortar_url(url: str, session: Session, large: int = LARGO_CODIGO) -> str:
     
     for _ in range(MAX_INTENTOS):
         url_code = token_urlsafe(large*2)[:large]
@@ -31,3 +32,17 @@ def acortar_url(url: str, session: Session, large: int = 8) -> str:
     session.refresh(new_link)
 
     return new_link.short_code
+
+def redirect_url(short_code: str, session: Session) -> str:
+    db_statement = select(Link).where(Link.short_code == short_code)
+    link = session.exec(db_statement).first()
+    if not link:
+        logger.warning(f"Short code no encontrado: {short_code}")
+        raise LinkNotFoundError
+    
+    link.visits += 1
+
+    session.add(link)
+    session.commit()
+
+    return link.original_url
